@@ -1,0 +1,82 @@
+#----------------------------------------------------------------------------
+# makefile	- adaptabuild-example is a bare bones stm32f0 demo
+#----------------------------------------------------------------------------
+
+.SUFFIXES :
+
+#----------------------------------------------------------------------------
+# Parse allowable command line options - consider hiding this complexity
+# in a Python script that kicks off the build, in fact, let's insist :-)
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+# Basic Macro, Assembler, Compiler, and Linker Definitions
+
+include adaptabuild/make/basic.mak
+# include adaptabuild/make/link.mak
+
+#----------------------------------------------------------------------------
+# adaptabuild library makefiles
+
+include src/stm32f0xx_hal_driver/adaptabuild.mak
+
+
+BUILD_DIRS := ./build
+
+# #----------------------------------------------------------------------------
+# 
+# DATE:=$(shell $(DATE) '+%d%h%Y')
+# 
+# #----------------------------------------------------------------------------
+# # Executable Targets
+# 
+# $(PRODUCT) : EXE_DIRS LIB_DIRS TARGET_LIBS PROCESSOR_LIBS
+# 	$(LINK) $(CONFIG)/$(PROCESSOR)/$(TARGET)/startup/obj/startup.o $($(CONFIG)_LF) --cref -o $(PRODUCT_LST)/$(PRODUCT).coff > $(PRODUCT_LST)/$(PRODUCT).cref
+# 	$(OBJCOPY) -I coff-h8300 -R .scratch -R .stacks -O srec $(PRODUCT_LST)/$(PRODUCT).coff $(PRODUCT_S19)/$(PRODUCT).srec
+# 	$(OBJDUMP) $($(CONFIG)_ODF) $(PRODUCT_LST)/$(PRODUCT).coff > $(PRODUCT_LST)/$(PRODUCT).dis
+# 	cp ./debug/h8300/rcx/exe/s19/$(PRODUCT).srec .
+# 
+# zips:
+# 	find anstest h h8300 ld m4 makeinc pbForth pbScripts tclAsm changelog.txt make* pbforth*.srec rcxdev.txt -type f > pbForth.lst
+# 	$(PKZIP) -add -path=specify $(PRODUCT).zip @$(PRODUCT).lst
+# 	$(TAR) -c --files-from=$(PRODUCT).lst | $(GZIP) > $(PRODUCT).tar.gz
+# 	find anstest pbScripts pbforth*.srec -type f > pbScripts.lst
+# 	$(PKZIP) -add -path=specify pbScripts.zip @pbScripts.lst
+# 	$(TAR) -c --files-from=pbScripts.lst | $(GZIP) > pbScripts.tar.gz
+# 
+# exe_dirs  := $(CONFIG)/$(PROCESSOR)/$(TARGET)/exe/lst \
+#              $(CONFIG)/$(PROCESSOR)/$(TARGET)/exe/s19
+# 
+# EXE_DIRS  : $(foreach exedir,$(exe_dirs),$(exedir))
+# 
+# 
+# lib_dirs  := $(CONFIG)/$(PROCESSOR)/$(TARGET)/lib  \
+#              $(CONFIG)/$(PROCESSOR)/lib
+# 
+# LIB_DIRS       : $(foreach libdir,$(lib_dirs),$(libdir))
+# 
+# 
+# target_libs := ./$(PROCESSOR)/$(TARGET)/startup   \
+#                ./$(PROCESSOR)/$(TARGET)/pbforth   \
+#                ./$(PROCESSOR)/$(TARGET)/firmdl    
+# 
+# TARGET_LIBS    : $(foreach lib,$(target_libs),$(lib).LIB)
+# 
+# 
+# processor_libs := ./$(PROCESSOR)/serial   \
+# 
+# PROCESSOR_LIBS : $(foreach lib,$(processor_libs),$(lib).LIB)
+# 
+# #----------------------------------------------------------------------------
+# # Other Targets
+ 
+# include adaptabuild/make/clean.mak
+# include adaptabuild/make/inf.mak
+
+# endif
+# endif
+# endif
+# endif
+# 
+# #---------------------------------------------------------------------------
+ 

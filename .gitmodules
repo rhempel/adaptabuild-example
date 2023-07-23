@@ -1,0 +1,24 @@
+[submodule "adaptabuild"]
+	path = adaptabuild
+	url = https://github.com/rhempel/adaptabuild.git
+[submodule "src/cmsis_device_f0"]
+	path = src/cmsis_device_f0
+	url = https://github.com/rhempel/cmsis_device_f0.git
+[submodule "src/src/cmsis_device_f0"]
+	path = src/src/cmsis_device_f0
+	url = https://github.com/rhempel/cmsis_device_f0.git
+[submodule "src/umm_libc"]
+	path = src/umm_libc
+	url = https://github.com/rhempel/umm_libc.git
+[submodule "src/stm32f0xx_hal_driver"]
+	path = src/stm32f0xx_hal_driver
+	url = https://github.com/rhempel/stm32f0xx_hal_driver.git
+[submodule "src/cmsis_core"]
+	path = src/cmsis_core
+	url = https://github.com/rhempel/cmsis_core
+[submodule "src/stm32l4xx_hal_driver"]
+	path = src/stm32l4xx_hal_driver
+	url = https://github.com/rhempel/stm32l4xx_hal_driver.git
+[submodule "src/umm_malloc"]
+	path = src/umm_malloc
+	url = https://github.com/rhempel/umm_malloc.git

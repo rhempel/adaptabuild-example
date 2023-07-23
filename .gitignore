@@ -1,0 +1,4 @@
+# All build output
+/build/*
+# All artifacts output
+/artifacts/*
