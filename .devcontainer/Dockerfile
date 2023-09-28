@@ -1,7 +1,11 @@
 FROM ubuntu:22.04
 
+# Note: The GID is super critical to get right - on my Linux machine it does
+#       not seem to matter, but on Windows I believe it requires the GID to
+#       match your UID in the WSL system?
+
 ARG USERNAME=adaptabuild
-ARG USER_UID=2000
+ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
 # Create the user
