@@ -6,7 +6,9 @@ ARG USER_GID=$USER_UID
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME && \
-    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+    useradd --uid $USER_UID --gid $USER_GID -d /home/$USERNAME -m -k /etc/skel -s /usr/bin/bash $USERNAME && \
+    mkdir -p /home/$USERNAME/projects && \
+    chown $USERNAME:$USERNAME /home/$USERNAME/projects
 
 # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
 RUN apt update && \

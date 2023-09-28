@@ -61,15 +61,16 @@
 
 // The workspace should later become /workspace, but we need to copy the .vscode folder
 // in there to get the launch.json and tasks.json visible
-//
-  "workspaceMount": "source=adaptabuild-volume,target=/workspace,type=volume",
-  "workspaceFolder": "/host-workspace",
+  "containerWorkspaceFolder": "/host-workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/host-workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/home/adaptabuild",
 //  "workspaceFolder": "/workspace",
 
   "mounts": [
-      "source=${localWorkspaceFolder},target=/host-workspace,type=bind,consistency=cached",
-      "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/adaptabuild/.ssh,type=bind,consistency=cached",
-  ],
+//      "source=${localWorkspaceFolder},target=/host-workspace,type=bind,consistency=cached",
+    "source=adaptabuild-volume,target=/home/adaptabuild/projects,type=volume,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/adaptabuild/.ssh,type=bind,consistency=cached",
+],
 
 
 //"remoteEnv": { "PROJECT_FOLDER": "${localWorkspaceFolder}" }
