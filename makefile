@@ -1,4 +1,19 @@
 # ----------------------------------------------------------------------------
+# Move these functions to a prefix file
+# define set_module
+#     $(eval MODULE := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
+# endef
+
+# define set_module_path
+# 	$(eval MODULE_PATH := $(SRC_PATH)/$(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
+# endef
+
+# Note the use of = (not :=) to defer evaluation until it is called
+make_current_makefile_path = $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+make_current_module_path = $(patsubst $(SRC_PATH)/%,%,$(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
+
+ROOT_PATH := $(call make_current_makefile_path)
+$(info ROOT_PATH is $(ROOT_PATH))
 
 # ----------------------------------------------------------------------------
 
@@ -10,9 +25,10 @@ else
   $(error PRODUCT must be one of $(PRODUCT_LIST))
 endif
 
-ADAPTABUILD_PATH := adaptabuild
+ADAPTABUILD_PATH := $(ROOT_PATH)/adaptabuild
 
-SRC_PATH    := src
+SRC_PATH    := $(ROOT_PATH)
+BUILD_PATH := $(ROOT_PATH)/build
 
 # ----------------------------------------------------------------------------
 
@@ -57,12 +73,13 @@ $(info MCU is $(MCU))
 include $(ADAPTABUILD_PATH)/make/mcu/validate_mcu.mak
 $(info MCU is $(MCU))
 
-BUILD_PATH    := build/$(PRODUCT)/$(MCU)
+BUILD_PATH    := $(BUILD_PATH)/$(PRODUCT)/$(MCU)
+$(info BUILD_PATH is $(BUILD_PATH))
 
-include $(MCU_MAK)
+include $(ROOT_PATH)/$(MCU_MAK)
 
-# include $(SRC_PATH)/umm_libc/adaptabuild.mak
-include $(SRC_PATH)/umm_malloc/adaptabuild.mak
+include $(ROOT_PATH)/src/umm_libc/adaptabuild.mak
+include $(ROOT_PATH)/src/umm_malloc/adaptabuild.mak
 
 # ----------------------------------------------------------------------------
 #.PHONY : all begin finish end siz
@@ -89,8 +106,8 @@ LDSCRIPT = adaptabuild-example.ld
 adaptabuild-example-foo: LDFLAGS +=  -T$(LDSCRIPT)
 
 adaptabuild-example-foo: $(MODULE_LIBS)
-	$(LD) -o $@ $(BUILD_PATH)/cmsis_device_f0/Source/Templates/gcc/startup_stm32f051x8.o < \
-	            $(BUILD_PATH)/cmsis_device_f0/main.o $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
+#	$(LD) -o $@ $(BUILD_PATH)/cmsis_device_f0/Source/Templates/gcc/startup_stm32f051x8.o < \
+#	            $(BUILD_PATH)/cmsis_device_f0/main.o $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
 
 # Move this into the unittest.mak field - we need to have one per module
 #
