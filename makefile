@@ -1,13 +1,6 @@
 # ----------------------------------------------------------------------------
 # Move these functions to a prefix file
-# define set_module
-#     $(eval MODULE := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
-# endef
-
-# define set_module_path
-# 	$(eval MODULE_PATH := $(SRC_PATH)/$(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
-# endef
-
+#
 # Note the use of = (not :=) to defer evaluation until it is called
 make_current_makefile_path = $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 make_current_module_path = $(patsubst $(SRC_PATH)/%,%,$(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
