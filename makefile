@@ -67,7 +67,6 @@ DEPFLAGS :=
 MODULE_LIBS :=
 MODULE_TEST_LIBS :=
 
-$(info MCU is $(MCU))
 include $(ADAPTABUILD_PATH)/make/mcu/validate_mcu.mak
 $(info MCU is $(MCU))
 
@@ -90,26 +89,8 @@ all: $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example
 MCU_MAK := $(addprefix $(ROOT_PATH)/$(SRC_PATH)/,$(MCU_MAK))
 include $(MCU_MAK)
 
-# include $(SRC_PATH)/umm_libc/adaptabuild.mak
-# include $(SRC_PATH)/umm_malloc/adaptabuild.mak
-
-# ----------------------------------------------------------------------------
-#.PHONY : all begin finish end siz
-#         build elf hex bin lss sym clean clean_list program
-
-#all: begin gccversion build finished end
-
-# build: nxt-echo nxt-gdb nxt-sound nxt-i2c nxt-lua
-#build: nxt-lua
-
-# build: nxt-scheme nxt-lua
-
-# include $(cmsis_device_f0_DEP)
-# include $(stm32f0xx_hal_driver_DEP)
-
-#adaptabuild-example: LDFLAGS += -L$(SRC_PATH)/products/$@/ -T$(LDSCRIPT)
-#adaptabuild-example: RUN_MODE := ROM_RUN
-#adaptabuild-example: CDEFS += -D VECTORS_IN_RAM
+include $(SRC_PATH)/umm_libc/adaptabuild.mak
+include $(SRC_PATH)/umm_malloc/adaptabuild.mak
 
 # ----------------------------------------------------------------------------
 # LDSCRIPT should be names based on the project and target cpu
@@ -166,9 +147,9 @@ $(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test: $(MODULE_LIBS)
 # ----------------------------------------------------------------------------
 # .PHONY targets that provide some eye candy for the make log
 
-clean:
-	rm -rf build/$(PRODUCT)
-	rm -rf artifacts/$(PRODUCT)
+#clean:
+#	rm -rf build/$(PRODUCT)
+#	rm -rf artifacts/$(PRODUCT)
 
 #begin:
 #	@echo
