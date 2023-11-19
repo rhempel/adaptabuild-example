@@ -1,6 +1,32 @@
 # ----------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------
+# Move these functions to a prefix file, but be careful because MAKEFILE_LIST
+# will be one deeper than you think!
+
+ABS_PATH := $(patsubst %/,%,$(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
+$(info ABS_PATH is $(ABS_PATH))
+
+ROOT_PATH := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+$(info ROOT_PATH is $(ROOT_PATH))
+
+ADAPTABUILD_PATH := $(ROOT_PATH)/adaptabuild
+
+MKPATH := mkdir -p
+
+# Note the use of = (not :=) to defer evaluation until it is called
+# make_current_makefile_path = $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+#
+# Note also that for this conditional to work, $(ROOT_PATH) must be defined before
+# the conditional is evaluated
+
+ifeq (.,$(ROOT_PATH))
+  make_current_module_path = $(patsubst $(SRC_PATH)/%/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+else
+  make_current_module_path = $(patsubst $(ROOT_PATH)/$(SRC_PATH)/%/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+endif
+
+# ----------------------------------------------------------------------------
 
 PRODUCT_LIST := foo bar
 PRODUCT_LIST += baz
@@ -9,23 +35,6 @@ ifneq ($(filter $(PRODUCT),$(PRODUCT_LIST)),)
 else
   $(error PRODUCT must be one of $(PRODUCT_LIST))
 endif
-
-ADAPTABUILD_PATH := adaptabuild
-
-SRC_PATH    := src
-
-# ----------------------------------------------------------------------------
-
-.SUFFIXES :
-
-.PHONY : all clean
-
-all: adaptabuild-example-foo
-
-# ----------------------------------------------------------------------------
-# Accumulate common macros here and put into an include later
-
-MKPATH := mkdir -p
 
 # Notes in useful generic CFLAGS
 # https://stackoverflow.com/questions/3375697/what-are-the-useful-gcc-flags-for-c
@@ -49,20 +58,40 @@ MKPATH := mkdir -p
 # ----------------------------------------------------------------------------
 
 MCU_MAK :=
+
+CDEFS :=
+CFLAGS :=
+LDFLAGS :=
+DEPFLAGS :=
+
 MODULE_LIBS :=
 MODULE_TEST_LIBS :=
-MCU_FAMILY :=
 
 $(info MCU is $(MCU))
 include $(ADAPTABUILD_PATH)/make/mcu/validate_mcu.mak
 $(info MCU is $(MCU))
 
-BUILD_PATH    := build/$(PRODUCT)/$(MCU)
+SRC_PATH   := src
+$(info SRC_PATH is $(SRC_PATH))
 
+BUILD_PATH := build/$(PRODUCT)/$(MCU)
+$(info BUILD_PATH is $(BUILD_PATH))
+
+# ----------------------------------------------------------------------------
+
+.SUFFIXES :
+
+.PHONY : all clean
+
+all: $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example
+
+# ----------------------------------------------------------------------------
+
+MCU_MAK := $(addprefix $(ROOT_PATH)/$(SRC_PATH)/,$(MCU_MAK))
 include $(MCU_MAK)
 
 # include $(SRC_PATH)/umm_libc/adaptabuild.mak
-include $(SRC_PATH)/umm_malloc/adaptabuild.mak
+# include $(SRC_PATH)/umm_malloc/adaptabuild.mak
 
 # ----------------------------------------------------------------------------
 #.PHONY : all begin finish end siz
@@ -82,16 +111,16 @@ include $(SRC_PATH)/umm_malloc/adaptabuild.mak
 #adaptabuild-example: RUN_MODE := ROM_RUN
 #adaptabuild-example: CDEFS += -D VECTORS_IN_RAM
 
-
 # ----------------------------------------------------------------------------
 # LDSCRIPT should be names based on the project and target cpu
-LDSCRIPT = adaptabuild-example.ld
-adaptabuild-example-foo: LDFLAGS +=  -T$(LDSCRIPT)
+LDSCRIPT = $(ROOT_PATH)/adaptabuild-example.ld
+$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: LDFLAGS +=  -T$(LDSCRIPT)
 
-adaptabuild-example-foo: $(MODULE_LIBS)
-	$(LD) -o $@ $(BUILD_PATH)/cmsis_device_f0/Source/Templates/gcc/startup_stm32f051x8.o < \
-	            $(BUILD_PATH)/cmsis_device_f0/main.o $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
-
+$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: $(MODULE_LIBS)
+	$(LD) -o $@ $(ROOT_PATH)/$(BUILD_PATH)/cmsis_device_f0/Source/Templates/gcc/startup_stm32f051x8.o < \
+	            $(ROOT_PATH)/$(BUILD_PATH)/cmsis_device_f0/main.o $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
+#   $(LD) -o $@ $(BUILD_PATH)/cmsis_device_h7/Source/Templates/gcc/startup_stm32h7a3xxq.o < \
+# 	            $(BUILD_PATH)/cmsis_device_h7/main.o $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
 # Move this into the unittest.mak field - we need to have one per module
 #
 LD_LIBRARIES := -Wl,-whole-archive build/foo/unittest/umm_malloc/umm_malloc.a 
