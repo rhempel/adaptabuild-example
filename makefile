@@ -86,11 +86,14 @@ all: $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example
 
 # ----------------------------------------------------------------------------
 
-MCU_MAK := $(addprefix $(ROOT_PATH)/$(SRC_PATH)/,$(MCU_MAK))
-include $(MCU_MAK)
-
 include $(SRC_PATH)/umm_libc/adaptabuild.mak
 include $(SRC_PATH)/umm_malloc/adaptabuild.mak
+
+LIBC_INCPATH = $(SRC_PATH)/$(umm_libc_PATH)/include
+
+MCU_MAK := $(addprefix $(ROOT_PATH)/$(SRC_PATH)/,$(MCU_MAK))
+
+include $(MCU_MAK)
 
 # ----------------------------------------------------------------------------
 # LDSCRIPT should be names based on the project and target cpu
@@ -98,12 +101,9 @@ LDSCRIPT = $(ROOT_PATH)/adaptabuild-example.ld
 $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: LDFLAGS +=  -T$(LDSCRIPT)
 
 $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: $(MODULE_LIBS)
-	$(LD) -o $@ $(ROOT_PATH)/$(BUILD_PATH)/cmsis_device_f0/Source/Templates/gcc/startup_stm32f051x8.o < \
-	            $(ROOT_PATH)/$(BUILD_PATH)/cmsis_device_f0/main.o $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
-#   $(LD) -o $@ $(BUILD_PATH)/cmsis_device_h7/Source/Templates/gcc/startup_stm32h7a3xxq.o < \
-# 	            $(BUILD_PATH)/cmsis_device_h7/main.o $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
-# Move this into the unittest.mak field - we need to have one per module
-#
+	$(LD) -o $@ $(SYSTEM_STARTUP_OBJ) < \
+	            $(SYSTEM_MAIN_OBJ) $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
+
 LD_LIBRARIES := -Wl,-whole-archive build/foo/unittest/umm_malloc/umm_malloc.a 
 LD_LIBRARIES += -Wl,-no-whole-archive -lstdc++ -lCppUTest -lCppUTestExt -lgcov
 
