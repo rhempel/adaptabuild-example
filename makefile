@@ -88,6 +88,7 @@ all: $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example
 
 include $(SRC_PATH)/umm_libc/adaptabuild.mak
 include $(SRC_PATH)/umm_malloc/adaptabuild.mak
+include $(SRC_PATH)/voyager-bootloader/adaptabuild.mak
 
 LIBC_INCPATH = $(SRC_PATH)/$(umm_libc_PATH)/include
 
