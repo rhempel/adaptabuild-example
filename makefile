@@ -38,7 +38,7 @@ endif
 
 # Notes in useful generic CFLAGS
 # https://stackoverflow.com/questions/3375697/what-are-the-useful-gcc-flags-for-c
-# 
+#
 # -Wextra and -Wall: essential.
 # -Wfloat-equal: useful because usually testing floating-point numbers for equality is bad.
 # -Wundef: warn if an uninitialized identifier is evaluated in an #if directive.
@@ -54,7 +54,7 @@ endif
 # -Wswitch-enum: warn whenever a switch statement has an index of enumerated type and lacks a case for one or more of the named codes of that enumeration*.
 # -Wconversion: warn for implicit conversions that may alter a value*.
 # -Wunreachable-code: warn if the compiler detects that code will never be executed*.
-# 
+#
 # ----------------------------------------------------------------------------
 
 MCU_MAK :=
@@ -65,7 +65,8 @@ LDFLAGS :=
 DEPFLAGS :=
 
 MODULE_LIBS :=
-MODULE_TEST_LIBS :=
+
+TESTABLE_MODULES :=
 
 include $(ADAPTABUILD_PATH)/make/mcu/validate_mcu.mak
 $(info MCU is $(MCU))
@@ -75,6 +76,9 @@ $(info SRC_PATH is $(SRC_PATH))
 
 BUILD_PATH := build/$(PRODUCT)/$(MCU)
 $(info BUILD_PATH is $(BUILD_PATH))
+
+ARTIFACTS_PATH := artifacts/$(PRODUCT)/$(MCU)
+$(info ARTIFACTS_PATH is $(BUILD_PATH))
 
 # ----------------------------------------------------------------------------
 
@@ -86,7 +90,16 @@ all: $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example
 
 # ----------------------------------------------------------------------------
 
-include $(SRC_PATH)/umm_libc/adaptabuild.mak
+ifeq (host,$(MCU))
+    # Do nothing - we want the standard library for host builds
+else
+    $(info CFLAGS is $(CFLAGS))
+    CFLAGS += -nostdinc
+    $(info CFLAGS is $(CFLAGS))
+
+    include $(SRC_PATH)/umm_libc/adaptabuild.mak
+endif
+
 include $(SRC_PATH)/umm_malloc/adaptabuild.mak
 include $(SRC_PATH)/voyager-bootloader/adaptabuild.mak
 
@@ -97,48 +110,108 @@ MCU_MAK := $(addprefix $(ROOT_PATH)/$(SRC_PATH)/,$(MCU_MAK))
 include $(MCU_MAK)
 
 # ----------------------------------------------------------------------------
+# Default target for now:
+#
 # LDSCRIPT should be names based on the project and target cpu
-LDSCRIPT = $(ROOT_PATH)/adaptabuild-example.ld
-$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: LDFLAGS +=  -T$(LDSCRIPT)
 
+$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: LDSCRIPT = $(ROOT_PATH)/adaptabuild-example.ld
+$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: LDFLAGS +=  -T$(LDSCRIPT)
 $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: $(MODULE_LIBS)
 	$(LD) -o $@ $(SYSTEM_STARTUP_OBJ) < \
 	            $(SYSTEM_MAIN_OBJ) $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
 
-LD_LIBRARIES := -Wl,-whole-archive build/foo/unittest/umm_malloc/umm_malloc.a 
-LD_LIBRARIES += -Wl,-no-whole-archive -lstdc++ -lCppUTest -lCppUTestExt -lgcov
+# ----------------------------------------------------------------------------
+# Set up for unit testing of a specific module
+
+$(info TEST_MODULE is $(TEST_MODULE))
+$(info TESTABLE_MODULES is $(TESTABLE_MODULES))
+
+ifeq (unittest,$(MAKECMDGOALS))
+    ifneq ($(filter $(TEST_MODULE),$(TESTABLE_MODULES)),)
+    else
+      $(error TEST_MODULE must be one of $(TESTABLE_MODULES))
+    endif
+endif
+
+# LD_LIBRARIES := -Wl,-whole-archive build/foo/unittest/umm_malloc/umm_malloc.a
+# LD_LIBRARIES += -Wl,-no-whole-archive -lstdc++ -lCppUTest -lCppUTestExt -lgcov
 
 #$(MODULE_TEST_LIBS)
 
-# Find a way to cange to a directory and make all subsequent calls
+# Find a way to change to a directory and make all subsequent calls
 # relative to that location
 
-unittest: $(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test
-	mkdir -p artifacts/umm_malloc
-    # Create a baseline for code coverage
-	- cd artifacts/umm_malloc && \
-      lcov -z -d ../../$(BUILD_PATH)/umm_malloc/src
-    # Run the test suite
-	- cd artifacts/umm_malloc && \
-	  ../../$(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test -k umm_malloc -ojunit
-    # Create the test report
-	- cd artifacts/umm_malloc && \
-	  junit2html --merge cpputest_umm_malloc.xml *.xml && \
-	  junit2html cpputest_umm_malloc.xml umm_malloc.html && \
-	  rm cpputest_umm_malloc.xml
-    # Update the incremental code coverage
-	- cd artifacts/umm_malloc && \
-      lcov -c -d ../../$(BUILD_PATH)/umm_malloc/src -o umm_malloc.info
-    # Create the code coverage report
-	- cd artifacts/umm_malloc && \
-      genhtml *.info
-	  
-$(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test: $(MODULE_LIBS)
-	@echo Building $@ from $<
-	$(LD) -o $@ $(LD_LIBRARIES)  
+$(info ROOT_PATH/BUILD_PATH/TEST_MODULE is $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE))
+
+TEST_MODULE_LIB := $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE).a
+
+$(info TEST_MODULE_LIB is $(TEST_MODULE_LIB))
+
+unittest: $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest $(TEST_MODULE_LIB) artifacts_foo
+
+# TODO: Consider moving some of the library requirements to the module level test defines
+
+# $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/unittest: $(MODULE_LIBS)  -lstdc++ -lgcov --copy-dt-needed-entries
+$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest:
+$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: LDFLAGS := $(TEST_MODULE_LIB) $(LDFLAGS) -lCppUTest  -lCppUTestExt -lm -lgcov
+$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: $(TEST_MODULE_LIB)
+	$(LD) -o $@ \
+         $(LDFLAGS)
+
+artifacts_foo:
+  # Create the artifacts folder
+	mkdir -p $(ARTIFACTS_PATH)/$(TEST_MODULE)
+
+  # Create a baseline for code coverage
+	cd $(ARTIFACTS_PATH)/$(TEST_MODULE) && \
+    lcov -z -d --rc lcov_branch_coverage=1 $(ABS_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/src
+
+  # Run the test suite
+	cd $(ARTIFACTS_PATH)/$(TEST_MODULE) && \
+    $(ABS_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest -k $(TEST_MODULE) -ojunit
+
+  # Create the test report
+	cd $(ARTIFACTS_PATH)/$(TEST_MODULE) && \
+    junit2html --merge $(TEST_MODULE).xml *.xml && \
+	  junit2html $(TEST_MODULE).xml $(TEST_MODULE).html && \
+	  rm $(TEST_MODULE).xml
+
+  # Update the incremental code coverage
+	cd $(ARTIFACTS_PATH)/$(TEST_MODULE) && \
+    lcov -c -d --rc lcov_branch_coverage=1 $(ABS_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/src -o $(TEST_MODULE).info
+
+  # Create the code coverage report
+	cd $(ARTIFACTS_PATH)/$(TEST_MODULE) && \
+    genhtml --rc genhtml_branch_coverage=1 *.info
+
+
+# $(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test
+#	mkdir -p artifacts/umm_malloc
+#    # Create a baseline for code coverage
+#	- cd artifacts/umm_malloc && \
+#      lcov -z -d ../../$(BUILD_PATH)/umm_malloc/src
+#    # Run the test suite
+#	- cd artifacts/umm_malloc && \
+#	  ../../$(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test -k umm_malloc -ojunit
+#    # Create the test report
+#	- cd artifacts/umm_malloc && \
+#	  junit2html --merge cpputest_umm_malloc.xml *.xml && \
+#	  junit2html cpputest_umm_malloc.xml umm_malloc.html && \
+#	  rm cpputest_umm_malloc.xml
+
+#    # Update the incremental code coverage
+#	- cd artifacts/umm_malloc && \
+#      lcov -c -d ../../$(BUILD_PATH)/umm_malloc/src -o umm_malloc.info
+#    # Create the code coverage report
+#	- cd artifacts/umm_malloc && \
+#      genhtml *.info
+
+# $(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test: $(MODULE_LIBS)
+#	@echo Building $@ from $<
+#	$(LD) -o $@ $(LD_LIBRARIES)
 
 #./umm_malloc_test -ojunit
-#junit2html cpputest_FirstTestGroup.xml 
+#junit2html cpputest_FirstTestGroup.xml
 #gcov -j main test
 #lcov -c -i -d . -o main.info
 #lcov -c  -d . -o main_test.info
@@ -163,5 +236,5 @@ $(BUILD_PATH)/umm_malloc/unittest/umm_malloc_test: $(MODULE_LIBS)
 #	@echo $(MSG_END)
 #	@echo
 	
-#gccversion : 
-#	@$(CC) --version  
+#gccversion :
+#	@$(CC) --version
