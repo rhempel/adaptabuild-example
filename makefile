@@ -86,24 +86,25 @@ $(info ARTIFACTS_PATH is $(BUILD_PATH))
 
 .PHONY : all clean
 
-all: $(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example
+all: $(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT)
 
 # ----------------------------------------------------------------------------
 
 ifeq (host,$(MCU))
     # Do nothing - we want the standard library for host builds
 else
-    $(info CFLAGS is $(CFLAGS))
-    CFLAGS += -nostdinc
-    $(info CFLAGS is $(CFLAGS))
-
+#    $(info CFLAGS is $(CFLAGS))
+#    CFLAGS += -nostdinc
+#    $(info CFLAGS is $(CFLAGS))
+#
     include $(SRC_PATH)/umm_libc/adaptabuild.mak
+#    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
 include $(SRC_PATH)/umm_malloc/adaptabuild.mak
 include $(SRC_PATH)/voyager-bootloader/adaptabuild.mak
 
-LIBC_INCPATH = $(SRC_PATH)/$(umm_libc_PATH)/include
+include $(SRC_PATH)/product/$(PRODUCT)/adaptabuild.mak
 
 MCU_MAK := $(addprefix $(ROOT_PATH)/$(SRC_PATH)/,$(MCU_MAK))
 
@@ -113,12 +114,19 @@ include $(MCU_MAK)
 # Default target for now:
 #
 # LDSCRIPT should be names based on the project and target cpu
+#
+# Simplify to path to the product source and product_main and executable
 
-$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: LDSCRIPT = $(ROOT_PATH)/adaptabuild-example.ld
-$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: LDFLAGS +=  -T$(LDSCRIPT)
-$(ROOT_PATH)/$(BUILD_PATH)/adaptabuild-example: $(MODULE_LIBS)
+LDSCRIPT = $(SRC_PATH)/product/$(PRODUCT)/config/$(MCU)/linker_script.ld
+
+$(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT): LDFLAGS +=  -T$(LDSCRIPT)
+$(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT): $(MODULE_LIBS) $(LDSCRIPT)
 	$(LD) -o $@ $(SYSTEM_STARTUP_OBJ) < \
-	            $(SYSTEM_MAIN_OBJ) $(MODULE_LIBS) $(LDFLAGS) -Map=$@.map
+	            $(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/src/$(PRODUCT)_main.o \
+              --start-group $(MODULE_LIBS) --end-group $(LDFLAGS) \
+              -Map=$@.map
+
+# SYSTEM_MAIN_OBJ := $(ROOT_PATH)/$(BUILD_PATH)/$(MODULE_PATH)/main.o
 
 # ----------------------------------------------------------------------------
 # Set up for unit testing of a specific module
@@ -153,7 +161,7 @@ unittest: $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest $(TE
 
 # $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/unittest: $(MODULE_LIBS)  -lstdc++ -lgcov --copy-dt-needed-entries
 $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest:
-$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: LDFLAGS := $(TEST_MODULE_LIB) $(LDFLAGS) -lCppUTest  -lCppUTestExt -lm -lgcov
+$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: LDFLAGS := $(TEST_MODULE_LIB) $(LDFLAGS) -lCppUTest -lCppUTestExt -lm -lgcov
 $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: $(TEST_MODULE_LIB)
 	$(LD) -o $@ \
          $(LDFLAGS)
