@@ -34,3 +34,9 @@
 [submodule "src/voyager-bootloader"]
 	path = src/voyager-bootloader
 	url = https://github.com/rhempel/voyager-bootloader.git
+[submodule "src/cmsis_device_g0"]
+	path = src/cmsis_device_g0
+	url = https://github.com/STMicroelectronics/cmsis_device_g0.git
+[submodule "src/stm32g0xx_hal_driver"]
+	path = src/stm32g0xx_hal_driver
+	url = https://github.com/STMicroelectronics/stm32g0xx_hal_driver.git

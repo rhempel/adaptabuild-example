@@ -80,10 +80,14 @@ voyager_error_E voyager_bootloader_hal_jump_to_app(const voyager_bootloader_addr
     return VOYAGER_ERROR_NONE;
 }
 
+const voyager_bootloader_config_t voyager_bootloader_config = {
+    .jump_to_app_after_dfu_recv_complete = false,
+    .custom_crc_stream = NULL,
+};
 
 int main(void)
 {
-  voyager_bootloader_init();
+  voyager_bootloader_init(&voyager_bootloader_config);
 
   // For this application, we unlock DFU mode instantly
   voyager_bootloader_request(VOYAGER_REQUEST_ENTER_DFU);
