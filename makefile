@@ -1,29 +1,44 @@
 # ----------------------------------------------------------------------------
-
+# RENAME THIS TO adaptabuild.mak to avoid collision with original makefile
 # ----------------------------------------------------------------------------
-# Move these functions to a prefix file, but be careful because MAKEFILE_LIST
-# will be one deeper than you think!
-
+# adaptabuild.mak - top level adaptabuild compatible makefile for a project
+#
+# Invoke the build system with:
+#
+# make -f path/to/adaptabuild.mak
+#
+# AVOID CHANGING THIS FILE - your project specific includes come from the
+#                            adaptabuild.project.mak file
+#
+# The goal of adaptabuild is to hide most of the makefile complexity from
+# developers that don't want to learn the insides of yet another way to
+# build their project.
+#
+# This file may change over time as we continue to develop adaptabuild
+# ----------------------------------------------------------------------------
+# Do NOT move these functions - they must live in the top level makefile
+#
 ABS_PATH := $(patsubst %/,%,$(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 $(info ABS_PATH is $(ABS_PATH))
 
 ROOT_PATH := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 $(info ROOT_PATH is $(ROOT_PATH))
 
+# The adaptabuild path MUST be at the root level
+#
 ADAPTABUILD_PATH := $(ROOT_PATH)/adaptabuild
 
 MKPATH := mkdir -p
 
 # Note the use of = (not :=) to defer evaluation until it is called
-# make_current_makefile_path = $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 #
 # Note also that for this conditional to work, $(ROOT_PATH) must be defined before
 # the conditional is evaluated
-
+#
 ifeq (.,$(ROOT_PATH))
-  make_current_module_path = $(patsubst $(SRC_PATH)/%/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+  make_current_module_path = $(patsubst $(SRC_PATH)/%/,%,$(ROOT_PATH)/$(dir $(lastword $(MAKEFILE_LIST))))
 else
-  make_current_module_path = $(patsubst $(ROOT_PATH)/$(SRC_PATH)/%/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+  make_current_module_path = $(patsubst $(SRC_PATH)/%/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 endif
 
 # ----------------------------------------------------------------------------
@@ -71,14 +86,14 @@ TESTABLE_MODULES :=
 include $(ADAPTABUILD_PATH)/make/mcu/validate_mcu.mak
 $(info MCU is $(MCU))
 
-SRC_PATH   := src
+SRC_PATH   := $(ROOT_PATH)/src
 $(info SRC_PATH is $(SRC_PATH))
 
-BUILD_PATH := build/$(PRODUCT)/$(MCU)
+BUILD_PATH := $(ROOT_PATH)/build/$(PRODUCT)/$(MCU)
 $(info BUILD_PATH is $(BUILD_PATH))
 
-ARTIFACTS_PATH := artifacts/$(PRODUCT)/$(MCU)
-$(info ARTIFACTS_PATH is $(BUILD_PATH))
+ARTIFACTS_PATH := $(ROOT_PATH)/artifacts/$(PRODUCT)/$(MCU)
+$(info ARTIFACTS_PATH is $(ARTIFACTS_PATH))
 
 # ----------------------------------------------------------------------------
 
@@ -86,7 +101,18 @@ $(info ARTIFACTS_PATH is $(BUILD_PATH))
 
 .PHONY : all clean
 
-all: $(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT)
+all: foo bar baz bif
+
+foo:
+    $(info foo)
+
+bar:
+    $(info bar)
+
+baz:
+    $(info baz)
+
+bif: $(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT)
 
 # ----------------------------------------------------------------------------
 
@@ -106,7 +132,7 @@ include $(SRC_PATH)/voyager-bootloader/adaptabuild.mak
 
 include $(SRC_PATH)/product/$(PRODUCT)/adaptabuild.mak
 
-MCU_MAK := $(addprefix $(ROOT_PATH)/$(SRC_PATH)/,$(MCU_MAK))
+MCU_MAK := $(addprefix $(SRC_PATH)/,$(MCU_MAK))
 
 include $(MCU_MAK)
 
@@ -119,10 +145,10 @@ include $(MCU_MAK)
 
 LDSCRIPT = $(SRC_PATH)/product/$(PRODUCT)/config/$(MCU)/linker_script.ld
 
-$(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT): LDFLAGS +=  -T$(LDSCRIPT)
-$(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT): $(MODULE_LIBS) $(LDSCRIPT)
+$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT): LDFLAGS +=  -T$(LDSCRIPT)
+$(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT): $(MODULE_LIBS) $(LDSCRIPT)
 	$(LD) -o $@ $(SYSTEM_STARTUP_OBJ) < \
-	            $(ROOT_PATH)/$(BUILD_PATH)/product/$(PRODUCT)/src/$(PRODUCT)_main.o \
+	            $(BUILD_PATH)/product/$(PRODUCT)/src/$(PRODUCT)_main.o \
               --start-group $(MODULE_LIBS) --end-group $(LDFLAGS) \
               -Map=$@.map
 
@@ -149,22 +175,25 @@ endif
 # Find a way to change to a directory and make all subsequent calls
 # relative to that location
 
-$(info ROOT_PATH/BUILD_PATH/TEST_MODULE is $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE))
+$(info BUILD_PATH/TEST_MODULE is $(BUILD_PATH)/$(TEST_MODULE))
 
-TEST_MODULE_LIB := $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE).a
+TEST_MODULE_LIB := $(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE).a
 
 $(info TEST_MODULE_LIB is $(TEST_MODULE_LIB))
 
-unittest: $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest $(TEST_MODULE_LIB) artifacts_foo
+unittest: $(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest $(TEST_MODULE_LIB) artifacts_foo
 
 # TODO: Consider moving some of the library requirements to the module level test defines
 
-# $(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/unittest: $(MODULE_LIBS)  -lstdc++ -lgcov --copy-dt-needed-entries
-$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest:
-$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: LDFLAGS := $(TEST_MODULE_LIB) $(LDFLAGS) -lCppUTest -lCppUTestExt -lm -lgcov
-$(ROOT_PATH)/$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: $(TEST_MODULE_LIB)
+# $(BUILD_PATH)/$(TEST_MODULE)/unittest: $(MODULE_LIBS)  -lstdc++ -lgcov --copy-dt-needed-entries
+$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest:
+$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: LDFLAGS := $(TEST_MODULE_LIB) $(LDFLAGS) -lCppUTest -lCppUTestExt -lm -lgcov
+$(BUILD_PATH)/$(TEST_MODULE)/$(TEST_MODULE)_unittest: $(TEST_MODULE_LIB)
 	$(LD) -o $@ \
          $(LDFLAGS)
+
+# NOTE: the BUILD_PATH now has the ROOT_PATH built-in - so be careful how we update
+#       using the ABS_PATH!
 
 artifacts_foo:
   # Create the artifacts folder
