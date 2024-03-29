@@ -1,6 +1,4 @@
 # ----------------------------------------------------------------------------
-# RENAME THIS TO adaptabuild.mak to avoid collision with original makefile
-# ----------------------------------------------------------------------------
 # adaptabuild.mak - top level adaptabuild compatible makefile for a project
 #
 # Invoke the build system with:
@@ -42,37 +40,11 @@ else
 endif
 
 # ----------------------------------------------------------------------------
-
-PRODUCT_LIST := foo bar
-PRODUCT_LIST += baz
-
-ifneq ($(filter $(PRODUCT),$(PRODUCT_LIST)),)
-else
-  $(error PRODUCT must be one of $(PRODUCT_LIST))
-endif
-
-# Notes in useful generic CFLAGS
-# https://stackoverflow.com/questions/3375697/what-are-the-useful-gcc-flags-for-c
+# The are GLOBAL variables that may be updated by included makefiles
 #
-# -Wextra and -Wall: essential.
-# -Wfloat-equal: useful because usually testing floating-point numbers for equality is bad.
-# -Wundef: warn if an uninitialized identifier is evaluated in an #if directive.
-# -Wshadow: warn whenever a local variable shadows another local variable, parameter or global variable or whenever a built-in function is shadowed.
-# -Wpointer-arith: warn if anything depends upon the size of a function or of void.
-# -Wcast-align: warn whenever a pointer is cast such that the required alignment of the target is increased. For example, warn if a char * is cast to an int * on machines where integers can only be accessed at two- or four-byte boundaries.
-# -Wstrict-prototypes: warn if a function is declared or defined without specifying the argument types.
-# -Wstrict-overflow=5: warns about cases where the compiler optimizes based on the assumption that signed overflow does not occur. (The value 5 may be too strict, see the manual page.)
-# -Wwrite-strings: give string constants the type const char[length] so that copying the address of one into a non-const char * pointer will get a warning.
-# -Waggregate-return: warn if any functions that return structures or unions are defined or called.
-# -Wcast-qual: warn whenever a pointer is cast to remove a type qualifier from the target type*.
-# -Wswitch-default: warn whenever a switch statement does not have a default case*.
-# -Wswitch-enum: warn whenever a switch statement has an index of enumerated type and lacks a case for one or more of the named codes of that enumeration*.
-# -Wconversion: warn for implicit conversions that may alter a value*.
-# -Wunreachable-code: warn if the compiler detects that code will never be executed*.
+# We define them to be empty strings here so that it's clear that they are
+# needed.
 #
-# ----------------------------------------------------------------------------
-
-MCU_MAK :=
 
 CDEFS :=
 CFLAGS :=
@@ -83,11 +55,29 @@ MODULE_LIBS :=
 
 TESTABLE_MODULES :=
 
-include $(ADAPTABUILD_PATH)/make/mcu/validate_mcu.mak
-$(info MCU is $(MCU))
-
+# ----------------------------------------------------------------------------
+# Do NOT move this include - it MUST be before the definition of MCU_MAK
+#
 SRC_PATH   := $(ROOT_PATH)/src
 $(info SRC_PATH is $(SRC_PATH))
+
+# ----------------------------------------------------------------------------
+# Do NOT move this include - it MUST be after the definition of SRC_PATH
+#                            and before the including adaptabuild_product.mak
+#
+# MCU_MAK is created as part of validate_mcu.mak - it is a list of files
+#         that is included later in this script that define targets for
+#         the MCU support libraries.
+#
+MCU_MAK :=
+
+include $(ADAPTABUILD_PATH)/make/mcu/validate_mcu.mak
+$(info MCU_MAK is $(MCU_MAK))
+
+# ----------------------------------------------------------------------------
+# Do NOT move this include - it MUST be after the definition of MCU_MAK
+#                                  and before the definition of BUILD_PATH
+include $(ROOT_PATH)/adaptabuild_product.mak
 
 BUILD_PATH := $(ROOT_PATH)/build/$(PRODUCT)/$(MCU)
 $(info BUILD_PATH is $(BUILD_PATH))
@@ -115,31 +105,21 @@ baz:
 bif: $(BUILD_PATH)/product/$(PRODUCT)/$(PRODUCT)
 
 # ----------------------------------------------------------------------------
+# Do NOT move this include - it MUST be after the definition of BUILD_PATH
+#                            and before anythiong that depends on MODULE_LIBS
+include $(ROOT_PATH)/adaptabuild_artifacts.mak
 
-ifeq (host,$(MCU))
-    # Do nothing - we want the standard library for host builds
-else
-#    $(info CFLAGS is $(CFLAGS))
-#    CFLAGS += -nostdinc
-#    $(info CFLAGS is $(CFLAGS))
+# ----------------------------------------------------------------------------
+# Do NOT move this include - it cannot be before any target definitions
 #
-    include $(SRC_PATH)/umm_libc/adaptabuild.mak
-#    LIBC_INCPATH = $(umm_libc_PATH)/include
-endif
-
-include $(SRC_PATH)/umm_malloc/adaptabuild.mak
-include $(SRC_PATH)/voyager-bootloader/adaptabuild.mak
+include $(MCU_MAK)
 
 include $(SRC_PATH)/product/$(PRODUCT)/adaptabuild.mak
-
-MCU_MAK := $(addprefix $(SRC_PATH)/,$(MCU_MAK))
-
-include $(MCU_MAK)
 
 # ----------------------------------------------------------------------------
 # Default target for now:
 #
-# LDSCRIPT should be names based on the project and target cpu
+# LDSCRIPT should be named based on the project and target cpu
 #
 # Simplify to path to the product source and product_main and executable
 
