@@ -42,7 +42,10 @@ $(MODULE)_SRCPATH += $(MODULE_PATH)/src
 
 $(MODULE)_INCPATH :=
 $(MODULE)_INCPATH += $(voyager-bootloader_PATH)/inc
-$(MODULE)_INCPATH += $(umm_libc_PATH)/include
+
+ifneq (host,$(MCU))
+  $(MODULE)_INCPATH += $(umm_libc_PATH)/include
+endif
 
 # ----------------------------------------------------------------------------
 # NOTE: The default config file must be created somehow - it is normally
