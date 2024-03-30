@@ -18,10 +18,7 @@ extern char OTA_IMAGE_END;
 struct application_space_t {
     uint32_t app_start_address;
     uint32_t app_end_address;
-} application_space = {
-    .app_start_address = (uint32_t)&OTA_IMAGE_START,
-    .app_end_address = (uint32_t)&OTA_IMAGE_END,
-};
+} application_space;
 
 struct application_info_t {
     uint32_t app_crc;
@@ -87,6 +84,9 @@ const voyager_bootloader_config_t voyager_bootloader_config = {
 
 int main(void)
 {
+  application_space.app_start_address = (uint32_t)&OTA_IMAGE_START;
+  application_space.app_end_address = (uint32_t)&OTA_IMAGE_END;
+
   voyager_bootloader_init(&voyager_bootloader_config);
 
   // For this application, we unlock DFU mode instantly
