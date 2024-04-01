@@ -11,4 +11,6 @@ $(call log_info,ROOT_PATH is $(ROOT_PATH))
 #
 ADAPTABUILD_PATH := $(ROOT_PATH)/adaptabuild
 
+LOG_NOTICE := x
+
 include $(ADAPTABUILD_PATH)/make/adaptabuild.mak
