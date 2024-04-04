@@ -40,3 +40,6 @@
 [submodule "src/stm32g0xx_hal_driver"]
 	path = src/stm32g0xx_hal_driver
 	url = https://github.com/STMicroelectronics/stm32g0xx_hal_driver.git
+[submodule "src/nanopb"]
+	path = src/nanopb
+	url = https://github.com/rhempel/nanopb.git

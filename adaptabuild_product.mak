@@ -4,7 +4,7 @@
 # Here is where you specify your product options
 # ----------------------------------------------------------------------------
 
-PRODUCT_LIST := baz bar
+PRODUCT_LIST := baz bar nanopb_poc
 PRODUCT_LIST += foo 
 
 ifneq ($(filter $(PRODUCT),$(PRODUCT_LIST)),)
