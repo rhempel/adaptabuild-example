@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# adaptabuild_libraries.mak - product specific include file
+# adaptabuild_artifacts.mak - product specific libraries file
 #
 # Here is where you specify the libraries or other artifacts your product
 # needs to have built.
@@ -8,12 +8,11 @@
 ifeq (host,$(MCU))
     # Do nothing - we want the standard library for host builds
 else
-#    $(info CFLAGS is $(CFLAGS))
-#    CFLAGS += -nostdinc
-#    $(info CFLAGS is $(CFLAGS))
-#
+    CFLAGS += -nostdinc
+
     include $(SRC_PATH)/umm_libc/adaptabuild.mak
-#    LIBC_INCPATH = $(umm_libc_PATH)/include
+
+    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
 include $(SRC_PATH)/umm_malloc/adaptabuild.mak
