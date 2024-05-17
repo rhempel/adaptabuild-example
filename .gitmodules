@@ -43,3 +43,6 @@
 [submodule "src/nanopb"]
 	path = src/nanopb
 	url = https://github.com/rhempel/nanopb.git
+[submodule "src/CANopenNode"]
+	path = src/CANopenNode
+	url = https://github.com/rhempel/CANopenNode.git
