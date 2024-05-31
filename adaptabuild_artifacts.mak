@@ -18,7 +18,7 @@ endif
 include $(SRC_PATH)/umm_malloc/adaptabuild.mak
 include $(SRC_PATH)/voyager-bootloader/adaptabuild.mak
 include $(SRC_PATH)/nanopb/adaptabuild.mak
-include $(SRC_PATH)/CANopenNode/adaptabuild.mak
+# include $(SRC_PATH)/CANopenNode/adaptabuild.mak
 
 # Notes in useful generic CFLAGS
 # https://stackoverflow.com/questions/3375697/what-are-the-useful-gcc-flags-for-c
