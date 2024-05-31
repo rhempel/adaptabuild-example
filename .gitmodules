@@ -46,3 +46,9 @@
 [submodule "src/CANopenNode"]
 	path = src/CANopenNode
 	url = https://github.com/rhempel/CANopenNode.git
+[submodule "src/pico-sdk"]
+	path = src/pico-sdk
+	url = https://github.com/rhempel/pico-sdk.git
+[submodule "src/nrfx"]
+	path = src/nrfx
+	url = https://github.com/rhempel/nrfx.git
