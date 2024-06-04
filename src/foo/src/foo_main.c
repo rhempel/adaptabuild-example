@@ -1,6 +1,6 @@
 #include "voyager.h"
 
-void __libc_init_array(void) {};
+// void __libc_init_array(void) {};
 
 voyager_error_E voyager_bootloader_send_to_host(void const *const data, size_t len)
 {

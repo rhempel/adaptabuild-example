@@ -8,11 +8,9 @@
 ifeq (host,$(MCU))
     # Do nothing - we want the standard library for host builds
 else
-    CFLAGS += -nostdinc
-
-    include $(SRC_PATH)/umm_libc/adaptabuild.mak
-
-    LIBC_INCPATH = $(umm_libc_PATH)/include
+#    CFLAGS += -nostdinc
+#    include $(SRC_PATH)/umm_libc/adaptabuild.mak
+#    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
 include $(SRC_PATH)/umm_malloc/adaptabuild.mak
