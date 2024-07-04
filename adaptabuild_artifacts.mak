@@ -13,9 +13,9 @@ else
 #    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
-include $(SRC_PATH)/umm_malloc/adaptabuild.mak
-include $(SRC_PATH)/voyager-bootloader/adaptabuild.mak
-include $(SRC_PATH)/nanopb/adaptabuild.mak
+include $(SRC_PATH)/third_party/umm_malloc/adaptabuild.mak
+include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild.mak
+include $(SRC_PATH)/third_party/nanopb/adaptabuild.mak
 # include $(SRC_PATH)/CANopenNode/adaptabuild.mak
 
 # Notes in useful generic CFLAGS
