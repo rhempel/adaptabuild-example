@@ -2,3 +2,6 @@
 /build/*
 # All artifacts output
 /artifacts/*
+
+# Temporary ignore of nanopb_poc
+src/nanopb_poc/

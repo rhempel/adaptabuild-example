@@ -32,22 +32,22 @@
 
 // Some of these time related defs should go to <types.h> and be re-included here
 
-typedef unsigned int pid_t;
+typedef int pid_t;
 
-typedef long clock_t;		   /* unit for system accounting */
+typedef long unsigned int clock_t;		   /* unit for system accounting */
 
 /*
  * Structure returned by gettimeofday(2) system call, and used in other calls.
  */
-typedef	unsigned long time_t;
-typedef	unsigned long suseconds_t;
+typedef	long long int time_t;
+typedef	long int suseconds_t;
 
 struct timeval {
 	time_t		tv_sec;		/* seconds */
 	suseconds_t	tv_usec;	/* and microseconds */
 };
 
-typedef	unsigned long suseconds_t;
+// typedef	unsigned long suseconds_t;
 
 /*  Get Process Times, P1003.1b-1993, p. 92 */
 struct tms {

@@ -11,3 +11,6 @@ ifneq ($(filter $(PRODUCT),$(PRODUCT_LIST)),)
 else
   $(error PRODUCT must be one of $(PRODUCT_LIST))
 endif
+
+PRODUCT_MAIN := foo/src/foo_main
+

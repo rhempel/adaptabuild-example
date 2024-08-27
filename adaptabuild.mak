@@ -17,4 +17,8 @@ LOG_NOTICE ?= x
 LOG_INFO ?=
 LOG_DEBUG ?=
 
+# Add any top level definitions for adaptabuild here:
+#
+GCC_VERSION := 10.3.1
+
 include $(ADAPTABUILD_PATH)/make/adaptabuild.mak
