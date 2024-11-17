@@ -4,9 +4,6 @@
 [submodule "src/cmsis_device_f0"]
 	path = src/third_party/cmsis_device_f0
 	url = https://github.com/rhempel/cmsis_device_f0.git
-[submodule "src/src/cmsis_device_f0"]
-	path = src/src/cmsis_device_f0
-	url = https://github.com/rhempel/cmsis_device_f0.git
 [submodule "src/umm_libc"]
 	path = src/third_party/umm_libc
 	url = https://github.com/rhempel/umm_libc.git
