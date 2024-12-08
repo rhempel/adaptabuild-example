@@ -35,10 +35,7 @@ SRC_C += src/foo_main.c
 SRC_TEST +=
 
 # ----------------------------------------------------------------------------
-# Set up the module level source and include paths
-
-$(MODULE)_SRCPATH :=
-$(MODULE)_SRCPATH += $(MODULE_PATH)/src
+# Set up the module level include path
 
 $(MODULE)_INCPATH :=
 # $(MODULE)_INCPATH += $(voyager-bootloader_PATH)/inc
