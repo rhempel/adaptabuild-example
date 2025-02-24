@@ -15,14 +15,14 @@ else ifeq (pico2040,$(MCU))
     # Do nothing
 else
 #    CFLAGS += -nostdinc
-#    include $(SRC_PATH)/umm_libc/adaptabuild.mak
+#    include $(SRC_PATH)/umm_libc/adaptabuild_module.mak
 #    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
-include $(SRC_PATH)/third_party/umm_malloc/adaptabuild.mak
-include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild.mak
-# include $(SRC_PATH)/third_party/nanopb/adaptabuild.mak
-# include $(SRC_PATH)/CANopenNode/adaptabuild.mak
+include $(SRC_PATH)/third_party/umm_malloc/adaptabuild_module.mak
+include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild_module.mak
+# include $(SRC_PATH)/third_party/nanopb/adaptabuild_module.mak
+# include $(SRC_PATH)/CANopenNode/adaptabuild_module.mak
 
 # Notes in useful generic CFLAGS
 # https://stackoverflow.com/questions/3375697/what-are-the-useful-gcc-flags-for-c
