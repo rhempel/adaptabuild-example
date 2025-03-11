@@ -33,10 +33,10 @@
 	url = https://github.com/rhempel/voyager-bootloader.git
 [submodule "src/third-party/cmsis_device_g0"]
 	path = src/third_party/cmsis_device_g0
-	url = https://github.com/STMicroelectronics/cmsis_device_g0.git
+	url = https://github.com/rhempel/cmsis_device_g0.git
 [submodule "src/third-party/stm32g0xx_hal_driver"]
 	path = src/third_party/stm32g0xx_hal_driver
-	url = https://github.com/STMicroelectronics/stm32g0xx_hal_driver.git
+	url = https://github.com/rhempel/stm32g0xx_hal_driver.git
 [submodule "src/third-party/nanopb"]
 	path = src/third_party/nanopb
 	url = https://github.com/rhempel/nanopb.git
