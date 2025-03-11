@@ -9,6 +9,8 @@ ifeq (host,$(MCU))
     # Do nothing - we want the standard library for host builds
 else ifeq (nRF52832,$(MCU))
     LDFLAGS += -L src/third_party/nrfx
+else ifeq (nRF51822,$(MCU))
+    LDFLAGS += -L src/third_party/nrfx
 else ifeq (pico2040,$(MCU))
     # Do nothing
 else
