@@ -41,7 +41,7 @@ $(MODULE)_SRCPATH :=
 $(MODULE)_SRCPATH += $(MODULE_PATH)/src
 
 $(MODULE)_INCPATH :=
-$(MODULE)_INCPATH += $(voyager-bootloader_PATH)/inc
+# $(MODULE)_INCPATH += $(voyager-bootloader_PATH)/inc
 
 # ----------------------------------------------------------------------------
 # NOTE: The default config file must be created somehow - it is normally

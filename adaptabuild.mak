@@ -15,7 +15,7 @@ LOG_ERROR ?=
 LOG_WARNING ?=
 LOG_NOTICE ?= x
 LOG_INFO ?=
-LOG_DEBUG ?=
+LOG_DEBUG ?= x
 
 # Add any top level definitions for adaptabuild here:
 #
