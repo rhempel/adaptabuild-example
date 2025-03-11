@@ -52,3 +52,6 @@
 [submodule "src/third_party/hal_adi"]
 	path = src/third_party/hal_adi
 	url = https://github.com/rhempel/hal_adi.git
+[submodule "src/third_party/cmrx"]
+	path = src/third_party/cmrx
+	url = https://github.com/rhempel/cmrx.git

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# foo makefile for adaptabuild
+# blindummyky makefile for adaptabuild
 #
 # This is designed to be included as part of a make system designed
 # to be expandable and maintainable using techniques found in:
@@ -7,7 +7,7 @@
 # Managing Projects with GNU Make - Robert Mecklenburg - ISBN 0-596-00610-1
 # ----------------------------------------------------------------------------
 
-MODULE := foo
+MODULE := dummy
 
 MODULE_PATH := $(call make_current_module_path)
 # $(info MODULE_PATH is $(MODULE_PATH))
@@ -30,7 +30,7 @@ SRC_C :=
 SRC_ASM :=
 SRC_TEST :=
 
-SRC_C += src/main.c
+SRC_C += src/dummy.c
 
 SRC_TEST +=
 
@@ -38,7 +38,9 @@ SRC_TEST +=
 # Set up the module level include path
 
 $(MODULE)_INCPATH :=
-# $(MODULE)_INCPATH += $(voyager-bootloader_PATH)/inc
+$(MODULE)_INCPATH += $(PRODUCT)/config/$(MCU)
+$(MODULE)_INCPATH += $(cmrx_PATH)/include
+$(MODULE)_INCPATH += $(cmrx_PATH)/src/os/arch/arm/cmsis
 
 # ----------------------------------------------------------------------------
 # NOTE: The default config file must be created somehow - it is normally
@@ -49,6 +51,10 @@ $(MODULE)_INCPATH :=
 # that's an easy pace to leave things like HAL config, linker scripts etc
 
 $(MODULE)_INCPATH += $(PRODUCT)/config/$(MCU)
+#$(MODULE)_INCPATH += $(cmsis_core_PATH)/Include
+##
+#$(MODULE)_INCPATH += $(hal_adi_PATH)/MAX/Include
+#$(MODULE)_INCPATH += $(hal_adi_PATH)/MAX/Libraries/CMSIS/Device/Maxim/MAX32690/Include
 
 # ----------------------------------------------------------------------------
 ifeq (unittest,$(MAKECMDGOALS))
@@ -56,9 +62,16 @@ endif
 
 # ----------------------------------------------------------------------------
 # Set any module level compile time defaults here
+#
+# CMSIS_DEVICE_INCLUDE should be a product level CDEF?
+# CONFIG_SOC_MAX32690 should be a product level CDEF?
 
-$(MODULE)_CDEFS :=
-$(MODULE)_CDEFS +=
+$(MODULE)_INCPATH += $(MCU_INCPATH) 
+$(MODULE)_CDEFS += $(MCU_CDEFS)
+
+ifeq (unittest,$(MAKECMDGOALS))
+endif
+
 
 $(MODULE)_CFLAGS :=
 $(MODULE)_CFLAGS +=

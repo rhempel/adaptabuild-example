@@ -1,11 +1,20 @@
 # ----------------------------------------------------------------------------
-# Do NOT move these functions - they must live in the top level makefile
+# Set any of these values to 'x' to turn on that level of
+# logging
 #
-
 LOG_WARNING ?= x
-LOG_NOTICE ?= x
+LOG_NOTICE ?=
 LOG_INFO ?= x
-LOG_DEBUG ?= x
+LOG_DEBUG ?=
+
+# ----------------------------------------------------------------------------
+# Controls the output of the command line that a rule executes when building
+# a dependency.
+#
+# Set to '@' (default) to disable output
+# Set to blank value to enable output
+#
+ECHO_COMMAND ?=
 
 # ROOT_PATH is the path to project relative to the directory that you called
 # this makefile from. The adaptabuild system need to know this so that it can

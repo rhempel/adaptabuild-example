@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# foo makefile for adaptabuild
+# blinky makefile for adaptabuild
 #
 # This is designed to be included as part of a make system designed
 # to be expandable and maintainable using techniques found in:
@@ -7,7 +7,7 @@
 # Managing Projects with GNU Make - Robert Mecklenburg - ISBN 0-596-00610-1
 # ----------------------------------------------------------------------------
 
-MODULE := foo
+MODULE := blinky
 
 MODULE_PATH := $(call make_current_module_path)
 # $(info MODULE_PATH is $(MODULE_PATH))
@@ -38,7 +38,10 @@ SRC_TEST +=
 # Set up the module level include path
 
 $(MODULE)_INCPATH :=
-# $(MODULE)_INCPATH += $(voyager-bootloader_PATH)/inc
+$(MODULE)_INCPATH += $(PRODUCT)/config/$(MCU)
+$(MODULE)_INCPATH += $(cmrx_PATH)/include
+$(MODULE)_INCPATH += $(cmrx_PATH)/src/os/arch/arm/cmsis
+$(MODULE)_INCPATH += $(cmsis_core_PATH)/Include
 
 # ----------------------------------------------------------------------------
 # NOTE: The default config file must be created somehow - it is normally
@@ -56,12 +59,22 @@ endif
 
 # ----------------------------------------------------------------------------
 # Set any module level compile time defaults here
+#
+# CMSIS_DEVICE_INCLUDE should be a product level CDEF?
+# CONFIG_SOC_MAX32690 should be a product level CDEF?
 
 $(MODULE)_CDEFS :=
-$(MODULE)_CDEFS +=
 
 $(MODULE)_CFLAGS :=
 $(MODULE)_CFLAGS +=
+
+ifeq ($(MCU),pico2040)
+    SRC_C += config/pico2040/quirks/pico-sdk/cmrx_isrs.c
+    SRC_ASM += config/pico2040/quirks/pico-sdk/crt0.S
+endif
+
+$(MODULE)_INCPATH += $(MCU_INCPATH) 
+$(MODULE)_CDEFS += $(MCU_CDEFS)
 
 ifeq (unittest,$(MAKECMDGOALS))
 endif

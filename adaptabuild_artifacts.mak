@@ -7,10 +7,12 @@
 
 ifeq (host,$(MCU))
     # Do nothing - we want the standard library for host builds
-else ifeq (nRF52832,$(MCU))
-    LDFLAGS += -L src/third_party/nrfx
+else ifeq (stm32g0xx,$(MCU))
+#    LDFLAGS += -L src/third_party/nrfx
 else ifeq (nRF51822,$(MCU))
-    LDFLAGS += -L src/third_party/nrfx
+#    LDFLAGS += -L src/third_party/nrfx
+else ifeq (nRF51822,$(MCU))
+#    LDFLAGS += -L src/third_party/nrfx
 else ifeq (pico2040,$(MCU))
     # Do nothing
 else
@@ -19,8 +21,11 @@ else
 #    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
-include $(SRC_PATH)/third_party/umm_malloc/adaptabuild_module.mak
-include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild_module.mak
+# include $(SRC_PATH)/third_party/umm_malloc/adaptabuild_module.mak
+# include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild_module.mak
+include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
+include $(SRC_PATH)/dummy/adaptabuild_module.mak
+# include $(SRC_PATH)/foo/adaptabuild_module.mak
 # include $(SRC_PATH)/third_party/nanopb/adaptabuild_module.mak
 # include $(SRC_PATH)/CANopenNode/adaptabuild_module.mak
 
