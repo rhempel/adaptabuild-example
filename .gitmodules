@@ -4,9 +4,6 @@
 [submodule "src/third-party/cmsis_device_f0"]
 	path = src/third_party/cmsis_device_f0
 	url = https://github.com/rhempel/cmsis_device_f0.git
-[submodule "src/third-party/umm_libc"]
-	path = src/third_party/umm_libc
-	url = https://github.com/rhempel/umm_libc.git
 [submodule "src/third-party/stm32f0xx_hal_driver"]
 	path = src/third_party/stm32f0xx_hal_driver
 	url = https://github.com/rhempel/stm32f0xx_hal_driver.git
