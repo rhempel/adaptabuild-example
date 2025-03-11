@@ -128,14 +128,7 @@ SRC_C += CANopen.c
 # SRC_C += misc/checksums.c
 
 # ----------------------------------------------------------------------------
-# Set up the module level source and include paths
-
-$(MODULE)_SRCPATH :=
-# $(MODULE)_SRCPATH += $(MODULE_PATH)/ansi
-# $(MODULE)_SRCPATH += $(MODULE_PATH)/math
-# $(MODULE)_SRCPATH += $(MODULE_PATH)/mathf
-# $(MODULE)_SRCPATH += $(MODULE_PATH)/stdio
-# $(MODULE)_SRCPATH += $(MODULE_PATH)/misc
+# Set up the module level include path
 
 $(MODULE)_INCPATH :=
 $(MODULE)_INCPATH += $(MODULE_PATH)
