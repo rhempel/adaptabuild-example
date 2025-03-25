@@ -23,9 +23,9 @@ endif
 
 # include $(SRC_PATH)/third_party/umm_malloc/adaptabuild_module.mak
 # include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild_module.mak
-include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
-include $(SRC_PATH)/dummy/adaptabuild_module.mak
-# include $(SRC_PATH)/foo/adaptabuild_module.mak
+# include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
+# include $(SRC_PATH)/dummy/adaptabuild_module.mak
+  include $(SRC_PATH)/foo/adaptabuild_module.mak
 # include $(SRC_PATH)/third_party/nanopb/adaptabuild_module.mak
 # include $(SRC_PATH)/CANopenNode/adaptabuild_module.mak
 

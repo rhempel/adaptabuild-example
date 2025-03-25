@@ -1,20 +1,21 @@
 ## What is `adaptabuild`?
 
 The `adaptabuild` system is really three components that work together
-to make setting up an Embedded Systems Devlopment environment much less
+to make setting up an Embedded Systems Development environment much less
 complex, no matter which OS your host computer runs - Linux, Windows,
 or MacOS.
 
 The three components are:
 
-1. A Docker image (~2.2 GB) based on Ubuntu:22.04-LTS that has everything
-   needed to develop, test, debug, and document an ARM Cortex project
-   from the Linux command line.
+1. A Docker/Podman image (~2.2 GB) based on Ubuntu:22.04-LTS that has
+   everything needed to develop, test, debug, and document an ARM Cortex
+   project from the Linux command line.
 
-2. A VSCode Devcontainer that is build from the Docker image that has
-   all the plugins needed to develop, test, debug, and document an ARM
-   Cortex project. That means VSCode *is* the IDE - you can single
-   step your code, look at MCU registers, read/write memory, etc.
+2. A VSCode Devcontainer that is build from the Docker/Podman image
+   that has all the plugins needed to develop, test, debug, and
+   document an ARM Cortex project. That means VSCode *is* the
+   IDE - you can single step your code, look at MCU registers,
+   read/write memory, etc.
 
 3. An optional build system based on `make` that lets you focus on
    your project, not learn yet another new and more complex build
@@ -28,18 +29,19 @@ the lives of embedded systems developers. We do this by minimizing the
 number of manual steps required to get started, and by allowing developers
 to customize their devcontainers as needed to suit their workflow.
 
-You and your team can work in a standardized environment - no
-more wasting time figuring out why the build fails on Evan's machine
-and works on Rebecca's.
+You and your team can work in a standardized environment that you have
+complete control over - no more wasting time figuring out why the build
+fails on Evan's machine and works on Rebecca's.
 
-When you check your work in to `git`, the *same* Docker base image
+When you check your work in to `git`, the *same* Docker/Podman base image
 can be used to build your project using whatever pipeline manager your
 CI system uses.
 
 The source for the Docker image and VSCode devcontainer are freely available
 so you can tune the contents if necessary. "Infrastructure as code" is one
 of the North Star design goals for this project. Nobody wants to spend time
-hand-tweaking development environments.
+hand-tweaking development environments, but you do have that option if you
+need it.
 
 ## Who Is This Guide For?
 

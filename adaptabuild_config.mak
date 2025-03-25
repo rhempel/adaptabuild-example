@@ -3,8 +3,8 @@
 # logging
 #
 LOG_WARNING ?= x
-LOG_NOTICE ?=
-LOG_INFO ?= x
+LOG_NOTICE ?= 
+LOG_INFO ?= 
 LOG_DEBUG ?=
 
 # ----------------------------------------------------------------------------
@@ -14,6 +14,8 @@ LOG_DEBUG ?=
 # Set to '@' (default) to disable output
 # Set to blank value to enable output
 #
+# WAIT - DO WE NEED TO DO THIS OR IS IT CLEANER TO USE THE --silent FLAG?
+#
 ECHO_COMMAND ?=
 
 # ROOT_PATH is the path to project relative to the directory that you called
@@ -21,8 +23,6 @@ ECHO_COMMAND ?=
 # include the files it needs.
 #
 ROOT_PATH := $(dir $(firstword $(MAKEFILE_LIST)))
-
-#ROOT_PATH := $(patsubst %/,%,$(dir $(firstword $(MAKEFILE_LIST))))
 
 # The adaptabuild path MUST be at the root level - unfortunately there is
 # currently no obvious (to me) way to move this boilerplate into an include file.
