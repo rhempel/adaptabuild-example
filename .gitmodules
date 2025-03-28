@@ -55,3 +55,9 @@
 [submodule "src/third_party/stm32-svd"]
 	path = src/third_party/stm32-svd
 	url = https://github.com/svcguy/stm32-svd.git
+[submodule "src/third_party/stm32g4xx-hal-driver"]
+	path = src/third_party/stm32g4xx-hal-driver
+	url = https://github.com/rhempel/stm32g4xx-hal-driver
+[submodule "src/third_party/cmsis-device-g4"]
+	path = src/third_party/cmsis-device-g4
+	url = https://github.com/rhempel/cmsis-device-g4
