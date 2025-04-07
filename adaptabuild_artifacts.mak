@@ -21,11 +21,19 @@ else
 #    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
+ifeq (foo,$(PRODUCT))
+  include $(SRC_PATH)/foo/adaptabuild_module.mak
+
+else ifeq (blinky,$(PRODUCT))
+  include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
+  include $(SRC_PATH)/blinky/adaptabuild_module.mak
+
+endif
+
 # include $(SRC_PATH)/third_party/umm_malloc/adaptabuild_module.mak
 # include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild_module.mak
 # include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
 # include $(SRC_PATH)/dummy/adaptabuild_module.mak
-  include $(SRC_PATH)/foo/adaptabuild_module.mak
 # include $(SRC_PATH)/third_party/nanopb/adaptabuild_module.mak
 # include $(SRC_PATH)/CANopenNode/adaptabuild_module.mak
 

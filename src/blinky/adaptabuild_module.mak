@@ -31,6 +31,7 @@ SRC_ASM :=
 SRC_TEST :=
 
 SRC_C += src/main.c
+SRC_C += src/blinky_main.c
 
 SRC_TEST +=
 
@@ -93,5 +94,13 @@ ifeq (unittest,$(MAKECMDGOALS))
 # $(MODULE)_test_main = $(MODULE)/test/main.o
 # include $(ADAPTABUILD_PATH)/make/test/cpputest.mak
 endif
+
+# ----------------------------------------------------------------------------
+# Update the generated CMRX linker scripts with information about where to
+# find our libraries
+#
+pre_executable::
+	$(call log_warning,blinky pre_executable)
+	$(CMRX_GENLINK_CMSIS) --add-application $(BUILD_PATH)/$($(MODULE)_PATH)/$(MODULE).a blinky $(CUSTOM_LINKER_SCRIPT_PATH)
 
 # ----------------------------------------------------------------------------

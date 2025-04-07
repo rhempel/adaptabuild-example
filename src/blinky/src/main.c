@@ -11,6 +11,6 @@ long timing_get_current_cpu_freq(void)
 int main(void)
 {
    timing_provider_setup(1);
-    os_start();
-    return 0;
+   os_start();
+   return 0;
 }
