@@ -9,5 +9,6 @@ int main(void)
 
   while (true)
   {
+    // Do nothing - sit in a tight loop
   }
 }

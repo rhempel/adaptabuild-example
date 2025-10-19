@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# foo makefile for adaptabuild
+# validate_toolchain makefile for adaptabuild
 #
 # This is designed to be included as part of a make system designed
 # to be expandable and maintainable using techniques found in:
@@ -7,7 +7,7 @@
 # Managing Projects with GNU Make - Robert Mecklenburg - ISBN 0-596-00610-1
 # ----------------------------------------------------------------------------
 
-MODULE := foo
+MODULE := validate_toolchain
 
 MODULE_PATH := $(call make_current_module_path)
 # $(info MODULE_PATH is $(MODULE_PATH))

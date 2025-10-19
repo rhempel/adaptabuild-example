@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 
 PRODUCT_LIST := baz bar nanopb_poc blinky
-PRODUCT_LIST += foo 
+PRODUCT_LIST += validate_toolchain
 
 ifneq ($(filter $(PRODUCT),$(PRODUCT_LIST)),)
 else
