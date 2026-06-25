@@ -20,10 +20,11 @@
 #define __printflike(a, b)
 #endif
 
-#define __unused __attribute__ ((unused))
-#define __aligned(x) __attribute__ ((aligned (x)))
-#define __packed __attribute__ ((packed))
+// #define __unused __attribute__ ((unused))
+// #define __aligned(x) __attribute__ ((aligned (x)))
+// #define __packed __attribute__ ((packed))
 
+#if 0
 /* This define is also used outside of Newlib, e.g. in MinGW-w64 */
 #ifndef _TIMEVAL_DEFINED
 #define _TIMEVAL_DEFINED
@@ -63,6 +64,7 @@ struct timezone {
 };
 
 #endif /* _TIMEVAL_DEFINED */
+#endif /* 0 */
 
 #endif
 // #define PICO_SDK_VERSION_MAJOR    1

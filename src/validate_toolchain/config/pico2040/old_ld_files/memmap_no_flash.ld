@@ -1,3 +1,7 @@
+OTA_IMAGE_SIZE  = 0x4000;
+OTA_IMAGE_START = ORIGIN(RAM) + LENGTH(RAM) - OTA_IMAGE_SIZE;
+OTA_IMAGE_END   = ORIGIN(RAM) + LENGTH(RAM) - 1;
+
 /* Based on GCC ARM embedded samples.
    Defines the following symbols for use by code:
     __exidx_start
@@ -46,10 +50,8 @@ SECTIONS
         __reset_end = .;
         KEEP (*(.binary_info_header))
         __binary_info_header_end = .;
-        KEEP (*(.embedded_block))
-        __embedded_block_end = .;
         . = ALIGN(256);
-        KEEP (*(.vectors))
+          KEEP (*(.vectors))
         *(.time_critical*)
         *(.text*)
         . = ALIGN(4);
@@ -72,7 +74,6 @@ SECTIONS
     } > RAM
 
     .rodata : {
-        . = ALIGN(4);
         *(.rodata*)
         . = ALIGN(4);
         *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
@@ -109,6 +110,7 @@ SECTIONS
 
         . = ALIGN(4);
         *(.after_data.*)
+
         . = ALIGN(4);
         /* preinit data */
         PROVIDE_HIDDEN (__mutex_array_start = .);
@@ -139,15 +141,9 @@ SECTIONS
 
         *(.jcr)
         . = ALIGN(4);
-   } > RAM
-
-    .tdata : {
-        . = ALIGN(4);
-		*(.tdata .tdata.* .gnu.linkonce.td.*)
         /* All data end */
-        __tdata_end = .;
+        __data_end__ = .;
     } > RAM
-    PROVIDE(__data_end__ = .);
 
     .uninitialized_data (NOLOAD): {
         . = ALIGN(4);
@@ -155,36 +151,6 @@ SECTIONS
     } > RAM
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
-
-    .tbss (NOLOAD) : {
-        . = ALIGN(4);
-        __bss_start__ = .;
-        __tls_base = .;
-        *(.tbss .tbss.* .gnu.linkonce.tb.*)
-        *(.tcommon)
-
-        __tls_end = .;
-    } > RAM
-
-    .bss (NOLOAD) : {
-        . = ALIGN(4);
-        __tbss_end = .;
-
-        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
-        *(COMMON)
-        . = ALIGN(4);
-        __bss_end__ = .;
-    } > RAM
-
-    .heap (NOLOAD):
-    {
-        __end__ = .;
-        end = __end__;
-        KEEP(*(.heap*))
-    } > RAM
-    /* historically on GCC sbrk was growing past __HeapLimit to __StackLimit, however
-       to be more compatible, we now set __HeapLimit explicitly to where the end of the heap is */
-    __HeapLimit = ORIGIN(RAM) + LENGTH(RAM);
 
     /* Start and end symbols must be word-aligned */
     .scratch_x : {
@@ -202,6 +168,25 @@ SECTIONS
         __scratch_y_end__ = .;
     } > SCRATCH_Y
     __scratch_y_source__ = LOADADDR(.scratch_y);
+
+    .bss  : {
+        . = ALIGN(4);
+        __bss_start__ = .;
+        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.bss*)))
+        *(COMMON)
+        . = ALIGN(4);
+        __bss_end__ = .;
+    } > RAM
+
+    .heap (NOLOAD):
+    {
+        __end__ = .;
+        end = __end__;
+        __heap_start = .;
+        KEEP(*(.heap*))
+        __heap_end = .;
+        __HeapLimit = .;
+    } > RAM
 
     /* .stack*_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
@@ -228,17 +213,6 @@ SECTIONS
     __StackOneBottom = __StackOneTop - SIZEOF(.stack1_dummy);
     __StackBottom = __StackTop - SIZEOF(.stack_dummy);
     PROVIDE(__stack = __StackTop);
-
-    /* picolibc and LLVM */
-    PROVIDE (__heap_start = __end__);
-    PROVIDE (__heap_end = __HeapLimit);
-    PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
-    PROVIDE( __tls_size_align = (__tls_size + __tls_align - 1) & ~(__tls_align - 1));
-    PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
-
-    /* llvm-libc */
-    PROVIDE (_end = __end__);
-    PROVIDE (__llvm_libc_heap_limit = __HeapLimit);
 
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed")

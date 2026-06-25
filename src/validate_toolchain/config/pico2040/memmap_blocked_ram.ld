@@ -23,7 +23,8 @@
 
 MEMORY
 {
-    RAM(rwx) : ORIGIN =  0x20000000, LENGTH = 256k
+    INCLUDE "pico_flash_region.ld"
+    RAM(rwx) : ORIGIN =  0x21000000, LENGTH = 256k
     SCRATCH_X(rwx) : ORIGIN = 0x20040000, LENGTH = 4k
     SCRATCH_Y(rwx) : ORIGIN = 0x20041000, LENGTH = 4k
 }
@@ -32,28 +33,44 @@ ENTRY(_entry_point)
 
 SECTIONS
 {
-    /* Note in NO_FLASH builds the entry point for both the bootrom, and debugger
-       entry (ELF entry point), are *first* in the image, and the vector table
-       follows immediately afterward. This is because the bootrom enters RAM
-       binaries directly at their lowest address (preferring main RAM over XIP
-       cache-as-SRAM if both are used).
+    /* Second stage bootloader is prepended to the image. It must be 256 bytes big
+       and checksummed. It is usually built by the boot_stage2 target
+       in the Raspberry Pi Pico SDK
+    */
+
+    .flash_begin : {
+        __flash_binary_start = .;
+    } > FLASH
+
+    .boot2 : {
+        __boot2_start__ = .;
+        KEEP (*(.boot2))
+        __boot2_end__ = .;
+    } > FLASH
+
+    ASSERT(__boot2_end__ - __boot2_start__ == 256,
+        "ERROR: Pico second stage bootloader must be 256 bytes in size")
+
+    /* The second stage will always enter the image at the start of .text.
+       The debugger will use the ELF entry point, which is the _entry_point
+       symbol if present, otherwise defaults to start of .text.
+       This can be used to transfer control back to the bootrom on debugger
+       launches only, to perform proper flash setup.
     */
 
     .text : {
         __logical_binary_start = .;
-        __reset_start = .;
-        KEEP (*(.reset))
-        __reset_end = .;
+        KEEP (*(.vectors))
         KEEP (*(.binary_info_header))
         __binary_info_header_end = .;
         KEEP (*(.embedded_block))
         __embedded_block_end = .;
-        . = ALIGN(256);
-        KEEP (*(.vectors))
-        *(.time_critical*)
-        *(.text*)
-        . = ALIGN(4);
+        KEEP (*(.reset))
+        /* TODO revisit this now memset/memcpy/float in ROM */
+        /* bit of a hack right now to exclude all floating point and time critical (e.g. memset, memcpy) code from
+         * FLASH ... we will include any thing excluded here in .data below by default */
         *(.init)
+        *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a:) .text*)
         *(.fini)
         /* Pull all c'tors into .text */
         *crtbegin.o(.ctors)
@@ -67,54 +84,6 @@ SECTIONS
         *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
         *(SORT(.dtors.*))
         *(.dtors)
-
-        *(.eh_frame*)
-    } > RAM
-
-    .rodata : {
-        . = ALIGN(4);
-        *(.rodata*)
-        . = ALIGN(4);
-        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
-        . = ALIGN(4);
-    } > RAM
-
-    .ARM.extab :
-    {
-        *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > RAM
-
-    __exidx_start = .;
-    .ARM.exidx :
-    {
-        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > RAM
-    __exidx_end = .;
-
-    /* Machine inspectable binary information */
-    . = ALIGN(4);
-    __binary_info_start = .;
-    .binary_info :
-    {
-        KEEP(*(.binary_info.keep.*))
-        *(.binary_info.*)
-    } > RAM
-    __binary_info_end = .;
-    . = ALIGN(4);
-
-    .data : {
-        __data_start__ = .;
-        *(vtable)
-        *(.data*)
-
-        . = ALIGN(4);
-        *(.after_data.*)
-        . = ALIGN(4);
-        /* preinit data */
-        PROVIDE_HIDDEN (__mutex_array_start = .);
-        KEEP(*(SORT(.mutex_array.*)))
-        KEEP(*(.mutex_array))
-        PROVIDE_HIDDEN (__mutex_array_end = .);
 
         . = ALIGN(4);
         /* preinit data */
@@ -137,22 +106,85 @@ SECTIONS
         *(.fini_array)
         PROVIDE_HIDDEN (__fini_array_end = .);
 
+        *(.eh_frame*)
+        . = ALIGN(4);
+    } > FLASH
+
+    .rodata : {
+        *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a:) .rodata*)
+        . = ALIGN(4);
+        *(SORT_BY_ALIGNMENT(SORT_BY_NAME(.flashdata*)))
+        . = ALIGN(4);
+    } > FLASH
+
+    .ARM.extab :
+    {
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+    } > FLASH
+
+    __exidx_start = .;
+    .ARM.exidx :
+    {
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    } > FLASH
+    __exidx_end = .;
+
+    /* Machine inspectable binary information */
+    . = ALIGN(4);
+    __binary_info_start = .;
+    .binary_info :
+    {
+        KEEP(*(.binary_info.keep.*))
+        *(.binary_info.*)
+    } > FLASH
+    __binary_info_end = .;
+    . = ALIGN(4);
+
+    .ram_vector_table (NOLOAD): {
+        *(.ram_vector_table)
+    } > RAM
+
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
+    } > RAM
+
+    .data : {
+        __data_start__ = .;
+        *(vtable)
+
+        *(.time_critical*)
+
+        /* remaining .text and .rodata; i.e. stuff we exclude above because we want it in RAM */
+        *(.text*)
+        . = ALIGN(4);
+        *(.rodata*)
+        . = ALIGN(4);
+
+        *(.data*)
+
+        . = ALIGN(4);
+        *(.after_data.*)
+        . = ALIGN(4);
+        /* preinit data */
+        PROVIDE_HIDDEN (__mutex_array_start = .);
+        KEEP(*(SORT(.mutex_array.*)))
+        KEEP(*(.mutex_array))
+        PROVIDE_HIDDEN (__mutex_array_end = .);
+
+        . = ALIGN(4);
         *(.jcr)
         . = ALIGN(4);
-   } > RAM
+    } > RAM AT> FLASH
 
     .tdata : {
         . = ALIGN(4);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
         /* All data end */
         __tdata_end = .;
-    } > RAM
+    } > RAM AT> FLASH
     PROVIDE(__data_end__ = .);
 
-    .uninitialized_data (NOLOAD): {
-        . = ALIGN(4);
-        *(.uninitialized_data*)
-    } > RAM
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
     __etext = LOADADDR(.data);
 
@@ -192,7 +224,7 @@ SECTIONS
         *(.scratch_x.*)
         . = ALIGN(4);
         __scratch_x_end__ = .;
-    } > SCRATCH_X
+    } > SCRATCH_X AT > FLASH
     __scratch_x_source__ = LOADADDR(.scratch_x);
 
     .scratch_y : {
@@ -200,7 +232,7 @@ SECTIONS
         *(.scratch_y.*)
         . = ALIGN(4);
         __scratch_y_end__ = .;
-    } > SCRATCH_Y
+    } > SCRATCH_Y AT > FLASH
     __scratch_y_source__ = LOADADDR(.scratch_y);
 
     /* .stack*_dummy section doesn't contains any symbols. It is only
@@ -220,6 +252,11 @@ SECTIONS
     {
         KEEP(*(.stack*))
     } > SCRATCH_Y
+
+    .flash_end : {
+        KEEP(*(.embedded_end_block*))
+        PROVIDE(__flash_binary_end = .);
+    } > FLASH
 
     /* stack limit is poorly named, but historically is maximum heap ptr */
     __StackLimit = ORIGIN(RAM) + LENGTH(RAM);
