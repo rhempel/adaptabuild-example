@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# adaptabuild_artifacts.mak - product specific libraries file
+# adaptabuild_artifacts.mak - product/mcu specific libraries file
 #
 # Here is where you specify the libraries or other artifacts your product
 # needs to have built.
@@ -7,28 +7,40 @@
 
 ifeq (host,$(MCU))
     # Do nothing - we want the standard library for host builds
-else ifeq (stm32g0xx,$(MCU))
+else ifeq (stm32g0xx,$(MCU_VARIANT))
 #    LDFLAGS += -L src/third_party/nrfx
-else ifeq (nRF51822,$(MCU))
+else ifeq (nRF51822,$(MCU_VARIANT))
 #    LDFLAGS += -L src/third_party/nrfx
-else ifeq (nRF51822,$(MCU))
+else ifeq (nRF51822,$(MCU_VARIANT))
 #    LDFLAGS += -L src/third_party/nrfx
-else ifeq (pico2040,$(MCU))
+else ifeq (pico2040,$(MCU_VARIANT))
     # Do nothing
+    $(call log_notice,pico-sdk_INCPATH is $(pico-sdk_INCPATH))
+    $(call log_notice,MCU_INCPATH is $(MCU_INCPATH))
+
 else
 #    CFLAGS += -nostdinc
 #    include $(SRC_PATH)/umm_libc/adaptabuild_module.mak
 #    LIBC_INCPATH = $(umm_libc_PATH)/include
 endif
 
+# Here is where we figure out which products are supported by specific MCU variants
+# or families
+#
 ifeq (foo,$(PRODUCT))
   include $(SRC_PATH)/foo/adaptabuild_module.mak
 
-else ifeq (blinky,$(PRODUCT))
-  include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
-  include $(SRC_PATH)/blinky/adaptabuild_module.mak
+else ifeq (cmrx_blinky,$(PRODUCT))
+  CMRX_MCU_FAMILY_LIST := pico2040 stm32g4xx
 
+  ifeq ($(filter $(MCU_FAMILY),$(CMRX_MCU_FAMILY_LIST)),)
+      $(error Unsupported MCU_FAMILY $(MCU_FAMILY) - must be one of $(CMRX_MCU_FAMILY_LIST))
+  else
+  endif
+
+  include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
 endif
+
 
 # include $(SRC_PATH)/third_party/umm_malloc/adaptabuild_module.mak
 # include $(SRC_PATH)/third_party/voyager-bootloader/adaptabuild_module.mak

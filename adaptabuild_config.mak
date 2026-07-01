@@ -3,7 +3,7 @@
 # logging
 #
 LOG_WARNING ?= x
-LOG_NOTICE ?= 
+LOG_NOTICE ?= x 
 LOG_INFO ?= 
 LOG_DEBUG ?=
 
