@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# cmrx_blinky makefile for adaptabuild
+# cmrx_blinky_off makefile for adaptabuild
 #
 # This is designed to be included as part of a make system designed
 # to be expandable and maintainable using techniques found in:
@@ -7,13 +7,13 @@
 # Managing Projects with GNU Make - Robert Mecklenburg - ISBN 0-596-00610-1
 # ----------------------------------------------------------------------------
 
-MODULE := cmrx_blinky
+MODULE := cmrx_blinky_off
 
 MODULE_PATH := $(call make_current_module_path)
-# $(info MODULE_PATH is $(MODULE_PATH))
+$(info MODULE_PATH is $(MODULE_PATH))
 
 $(MODULE)_PATH := $(MODULE_PATH)
-# $(info $(MODULE)_PATH is $($(MODULE)_PATH))
+$(info $(MODULE)_PATH is $($(MODULE)_PATH))
 
 # ----------------------------------------------------------------------------
 # Source file lists go here, C dependencies are automatically generated
@@ -30,9 +30,9 @@ SRC_C :=
 SRC_ASM :=
 SRC_TEST :=
 
-SRC_C += src/main.c
+#SRC_C += src/main.c
 #SRC_C += src/blinky.c
-#SRC_C += src/blinky_on.c
+SRC_C += src/blinky_off.c
 #SRC_C += src/blinky_off.c
 
 SRC_TEST +=
@@ -71,10 +71,10 @@ $(MODULE)_CDEFS +=
 $(MODULE)_CFLAGS :=
 $(MODULE)_CFLAGS +=
 
-ifeq ($(MCU_FAMILY),pico2040)
-    WEAK_OVERRIDES += $(BUILD_PATH)/$(PRODUCT)/$(PRODUCT).boot.padded_checksummed.o
-    WEAK_OVERRIDES += $(pico-sdk_WEAK_OBJ)
-endif
+#ifeq ($(MCU_FAMILY),pico2040)
+#    WEAK_OVERRIDES += $(BUILD_PATH)/$(PRODUCT)/$(PRODUCT).boot.padded_checksummed.o
+#    WEAK_OVERRIDES += $(pico-sdk_WEAK_OBJ)
+#endif
 
 $(MODULE)_INCPATH += $(MCU_INCPATH) 
 $(MODULE)_CDEFS += $(MCU_CDEFS)
@@ -101,10 +101,9 @@ endif
 # Update the generated CMRX linker scripts with information about where to
 # find our libraries
 #
-pre_executable::
-	$(call log_warning,blinky pre_executable)
-# Create is done in cmrx folder
-#	$(CMRX_GENLINK_CMSIS) --create $(SRC_PATH)/$($(MODULE)_PATH)/config/pico2040/memmap_default.ld $(SRC_PATH)/$($(MODULE)_PATH)/config/pico2040/cmrx_blinky.ld blinky
-	$(CMRX_GENLINK_CMSIS) --add-application $(BUILD_PATH)/$(cmrx_blinky_off_PATH)/cmrx_blinky_off.a $(PRODUCT) $(CUSTOM_LINKER_SCRIPT_PATH)
-	$(CMRX_GENLINK_CMSIS) --add-application $(BUILD_PATH)/$(cmrx_blinky_on_PATH)/cmrx_blinky_on.a $(PRODUCT) $(CUSTOM_LINKER_SCRIPT_PATH)
+#pre_executable::
+#	$(call log_warning,blinky pre_executable)
+## Create is done in cmrx folder
+##	$(CMRX_GENLINK_CMSIS) --create $(SRC_PATH)/$($(MODULE)_PATH)/config/pico2040/memmap_default.ld $(SRC_PATH)/$($(MODULE)_PATH)/config/pico2040/cmrx_blinky.ld blinky
+#	$(CMRX_GENLINK_CMSIS) --add-application $(BUILD_PATH)/$($(MODULE)_PATH)/$(MODULE).a $(PRODUCT) $(CUSTOM_LINKER_SCRIPT_PATH)
 # ----------------------------------------------------------------------------

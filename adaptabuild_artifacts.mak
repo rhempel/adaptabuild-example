@@ -39,6 +39,9 @@ else ifeq (cmrx_blinky,$(PRODUCT))
   endif
 
   include $(SRC_PATH)/third_party/cmrx/adaptabuild_module.mak
+  include $(SRC_PATH)/cmrx_blinky/adaptabuild_module.mak
+  include $(SRC_PATH)/cmrx_blinky/cmrx_blinky_off/adaptabuild_module.mak
+  include $(SRC_PATH)/cmrx_blinky/cmrx_blinky_on/adaptabuild_module.mak
 endif
 
 

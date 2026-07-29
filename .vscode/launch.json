@@ -38,18 +38,19 @@
       "servertype": "external",
       "gdbTarget": "host.gdb.gateway:2000",
       "gdbPath": "/usr/bin/gdb-multiarch",
-//      "showDevDebugOutput": "raw",
-      "overrideLaunchCommands": [
-        "interrupt",
-        "set $pc=&g_pfnVectors",
-      ],
-      "overrideResetCommands": [
-        "set $pc=&g_pfnVectors",
-      ],
-      "overrideRestartCommands": [
-        "interrupt",
-        "set $pc=&g_pfnVectors",
-      ],
+      "showDevDebugOutput": "raw",
+//      "overrideLaunchCommands": [
+//        "interrupt",
+//        "set $pc=&g_pfnVectors",
+//      ],
+//      "overrideResetCommands": [
+//        "interrupt",
+//        "set $pc=&g_pfnVectors",
+//      ],
+//      "overrideRestartCommands": [
+//        "interrupt",
+//        "set $pc=&g_pfnVectors",
+//      ],
     },
     {
       "name": "Debug validate_toolchain on STM32F0",
@@ -107,20 +108,20 @@
       "servertype": "external",
       "gdbTarget": "host.gdb.gateway:3333",
       "gdbPath": "/usr/bin/gdb-multiarch",
-//    "showDevDebugOutput": "raw",
+//      "showDevDebugOutput": "raw",
     },
     {
-      "name": "Debug blinky on STM32G4",
+      "name": "Debug cmrx_blinky on STM32G4",
       "cwd": "${userHome}/projects/adaptabuild-example",
-      "executable": "build/blinky/STM32G491xx/blinky/blinky.elf",
+      "executable": "build/cmrx_blinky/STM32G491RE/cmrx_blinky/cmrx_blinky.elf",
       "request": "launch",
       "type": "cortex-debug",
       "runToEntryPoint": "main",
       "servertype": "external",
       "gdbTarget": "host.gdb.gateway:3333",
       "gdbPath": "/usr/bin/gdb-multiarch",
-      "svdPath": "${userHome}/projects/adaptabuild-example/src/third_party/stm32-svd/g4/STM32G491xx.svd",
-//    "showDevDebugOutput": "raw",
+      "svdPath": "${userHome}/projects/adaptabuild-example/src/third_party/cmsis-svd-stm32/stm32g4/STM32G491.svd",
+      "showDevDebugOutput": "raw",
     },
     {
       "name": "Debug validate_toolchain on max32690",
